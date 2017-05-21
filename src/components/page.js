@@ -33,7 +33,6 @@ class Page extends React.Component {
 
 	tick() {
 		const x = Math.sin((new Date().getTime() - this._startTime) / 500);
-		console.log(x);
 		this.setState({
 			x: x
 		});

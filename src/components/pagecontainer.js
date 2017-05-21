@@ -31,28 +31,46 @@ class PageContainer extends React.Component {
 		$(this.refs.scroll).off('scroll', this.onScroll);	
 	}
 
-	_getRow(index) {
-		return Math.floor(index / 5) * 2 + ((index % 5) > 1 ? 1 : 0);
-	}
-
 	get _contentHeight() {
 		const pageHeight = 300;
-		const totalRows = this._getRow(this.props.pages.length - 1) + 1;
-		return pageHeight * totalRows + (12 * (totalRows + 1)) + this._contentInsetTop + this._contentInsetBottom;
+		return pageHeight * this.totalRows + (12 * (this.totalRows + 1)) + this._contentInsetTop + this._contentInsetBottom;
 	}
 
 	get _contentInsetTop() {
-		return this.props.containerHeight / 2;
+		return this.props.containerHeight * 0.5;
 	}
 	get _contentInsetBottom() {
-		return this.props.containerHeight / 2;
+		return this.props.containerHeight;
 	}
 
-	onPageHover(index) {
-
+	_actualTotalColumns(row) {
+		if (row === this.lastRow) {
+			return this.lastColumn + 1;
+		}
+		return this.props.layout[row] || this.props.defaultColumns;
 	}
 
 	render() {
+		let _row = 0;
+		let _column = 0;
+
+		this.props.pages.forEach((page, index) => {
+			page._row = _row;
+			page._column = _column;
+
+			_column += 1;
+			const totalColumns = this.props.layout[_row] || this.props.defaultColumns;
+			if (_column >= totalColumns) {
+				_row += 1;
+				_column = 0;
+			}
+		});
+
+		this.lastRow = _row;
+		this.lastColumn = _column - 1;
+
+		this.totalRows = _row + 1;
+
 		const x = this.state.x;
 
 		const pageHeight = 300;
@@ -62,24 +80,24 @@ class PageContainer extends React.Component {
 		const containerWidth = this.props.containerWidth;
 		const containerHeight = this.props.containerHeight;
 
-		const contentWidth = pageWidth * 3 + 12 * 2;
-		const centerOffsetX = (window.innerWidth - contentWidth) / 2;
 		const scrollYOffset = x * -(this._contentHeight - containerHeight);
 
 		const pages = this.props.pages.map((page, index) => {
 			if (page._y == null) {
 				page._y = Math.random();
 			}
-			const row = this._getRow(index);
-			const totalColumns = row % 2 === 0 ? 2 : 3;
-			const column = (index % 5) % 3;
+			const row = page._row;
+			const totalColumns = this._actualTotalColumns(row);
+			const contentWidth = pageWidth * totalColumns + 12 * (totalColumns - 1);
+			const centerOffsetX = (containerWidth - contentWidth) / 2;
+			const column = page._column;
 			
-			const offsetX = row % 2 === 0 ? pageWidth / 2 : 0;
+			const offsetX = (row + totalColumns) % 2 === 0 ? pageWidth / 4 : -pageWidth / 4;
 
 			const top = row * (pageHeight + 12) + topPadding + scrollYOffset + this._contentInsetTop;
 			let yPercentage = top / containerHeight;
 			yPercentage -= 0.5;
-			yPercentage += column / totalColumns * 1.0;
+			yPercentage += column / totalColumns;
 
 			if (yPercentage < 0) {
 				yPercentage = 0;
@@ -115,9 +133,7 @@ class PageContainer extends React.Component {
 						left: 0,
 						top: 0
 					}}>
-						<Page onHover={ () => {
-							this.onPageHover(index);
-						}}/>
+						<Page />
 					</div>
 				</div>
 			);
@@ -185,7 +201,9 @@ PageContainer.defaultProps = {
 	aspect: 2 / 3,
 	topPadding: 24,
 	pageBottomPadding: 24,
-	scrollHeight: 8000
+	scrollHeight: 8000,
+	layout: [ 2, 3, 4, 5, 6, 7 ],
+	defaultColumns: 2
 };
 
 export default Dimensions()(PageContainer);
