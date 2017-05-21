@@ -188,8 +188,6 @@ class PageContainer extends React.Component {
 };
 
 PageContainer.defaultProps = {
-	aspect: 2 / 3,
-	pageBottomPadding: 24,
 	scrollHeight: 8000,
 	layout: [ 2, 3, 4, 5, 4, 3, 3 ],
 	defaultColumns: 2,
