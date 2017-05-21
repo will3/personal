@@ -23,9 +23,8 @@ class App extends Component {
   }
 
   render() {
-    const pages = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+    const pages = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
     const navBarHeight = 44;
-    const pageHeight = window.innerHeight - navBarHeight - 24 - 24;
 
     return (
       <div className="App">
@@ -45,7 +44,7 @@ class App extends Component {
           bottom: 0,
           overflow: 'hidden'
         }}>
-          <PageContainer pages={pages} pageHeight={pageHeight}/>
+          <PageContainer pages={pages} />
         </div>
       </div>
     );
